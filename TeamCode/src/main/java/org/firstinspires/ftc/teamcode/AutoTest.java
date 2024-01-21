@@ -43,25 +43,24 @@ public class AutoTest extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        Pose2d startPose = new Pose2d(-36.85, -61.96, Math.toRadians(90.00));
+        Pose2d startPose = new Pose2d(-36.04, -62.93, Math.toRadians(90.00));
 
         drive.setPoseEstimate(startPose);
 
-        Trajectory Test1 = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-35.88, -49.48), Math.toRadians(88.23))
-                .splineTo(new Vector2d(11.91, -36.53), Math.toRadians(-0.97))
+        Trajectory leftPos = drive.trajectoryBuilder(startPose)
+                .splineTo(new Vector2d(-47.38, -30.86), Math.toRadians(111.27))
                 .build();
 
-        Trajectory MiddlePos = drive.trajectoryBuilder(startPose)
+        Trajectory middlePos = drive.trajectoryBuilder(startPose)
                 .splineTo(new Vector2d(-36.20, -24.00), Math.toRadians(88.68))
                 .build();
 
-        Trajectory Reverse = drive.trajectoryBuilder(MiddlePos.end())
+        Trajectory reverseMiddle = drive.trajectoryBuilder(middlePos.end())
                 .back(24)
                 .build();
 
-        Trajectory Test3 = drive.trajectoryBuilder(new Pose2d())
-                .splineTo(new Vector2d(30, 0), 0)
+        Trajectory reverseLeft = drive.trajectoryBuilder(leftPos.end())
+                .back(24)
                 .build();
 
         while(opModeIsActive()) {
@@ -80,7 +79,6 @@ public class AutoTest extends LinearOpMode {
              * Returns an empty array if no objects are seen.
              */
             HuskyLens.Block[] blocks = huskyLens.blocks();
-            int elementX = 0;
             telemetry.addData("Block count", blocks.length);
             for (HuskyLens.Block block : blocks) {
                 telemetry.addData("Block", block.toString());
@@ -90,21 +88,22 @@ public class AutoTest extends LinearOpMode {
             if (blocks.length >= 1) {
                 for (HuskyLens.Block block : blocks) {
                     if ((block.id == 2) && (block.x > 150)) {
-                        elementX = blocks[0].x;
                         telemetry.addLine("Middle Position");
-                        drive.followTrajectory(MiddlePos);
+                        drive.followTrajectory(middlePos);
                         sleep(100);
-                        drive.followTrajectory(Reverse);
+                        drive.followTrajectory(reverseMiddle);
                         requestOpModeStop();
                     } else if (blocks[0].x < 150) {
                         telemetry.addLine("Left Position");
-                        elementX = blocks[0].x;
+                        drive.followTrajectory(leftPos);
+                        sleep(100);
+                        drive.followTrajectory(reverseLeft);
+                        requestOpModeStop();
                     }
                 }
             } else {
                 telemetry.addLine("Right Position");
             }
-            telemetry.addData("X Pos", elementX);
             telemetry.update();
 
         }
