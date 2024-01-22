@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
 import java.util.concurrent.TimeUnit;
+
 @Autonomous
 public class AutoTest extends LinearOpMode {
 
@@ -52,7 +53,7 @@ public class AutoTest extends LinearOpMode {
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-36.20, -24.00), Math.toRadians(88.68))
+                .splineTo(new Vector2d(-36.20, -27.00), Math.toRadians(88.68))
                 .build();
 
         Trajectory reverseMiddle = drive.trajectoryBuilder(middlePos.end())
