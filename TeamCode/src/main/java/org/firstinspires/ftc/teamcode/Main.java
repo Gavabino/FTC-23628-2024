@@ -152,16 +152,16 @@ public class Main extends LinearOpMode {
                 }
 
                 if (gamepad2.a) {
-                    ArmMotor.setPower(1);
+                    ArmMotor.setPower(0.25);
                 } else if (gamepad2.b) {
-                    ArmMotor.setPower(-1);
+                    ArmMotor.setPower(-0.25);
                 } else {
                     ArmMotor.setPower(0);
                 }
                 if (gamepad2.right_trigger > 0.1) {
-                    SlideMotor.setPower(gamepad2.right_trigger);
+                    SlideMotor.setPower(gamepad2.right_trigger / 4);
                 } else if (gamepad2.left_trigger > 0.1) {
-                    SlideMotor.setPower(-gamepad2.left_trigger);
+                    SlideMotor.setPower(-gamepad2.left_trigger / 4);
                 } else {
                     SlideMotor.setPower(0);
                 }
