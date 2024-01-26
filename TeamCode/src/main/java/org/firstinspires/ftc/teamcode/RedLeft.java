@@ -132,10 +132,10 @@ public class RedLeft extends LinearOpMode {
                 //When right position is detected, place the pixel and then return
 
                 telemetry.addLine("Right Position");
-                drive.followTrajectory(rightPos);
+                /*drive.followTrajectory(rightPos);
                 sleep(100);
                 drive.followTrajectory(returnRight);
-                pixelPlaced = true;
+                pixelPlaced = true;*/
 
             }
 
