@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -39,50 +40,77 @@ public class RedLeft extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        boolean pixelPlaced = false;
-
         waitForStart();
 
         if (isStopRequested()) return;
 
-        Pose2d startPose = new Pose2d(-33.93, -63.09, Math.toRadians(90.00));
+        Pose2d startPose = new Pose2d(13.85, -62.77, Math.toRadians(90.00));
 
-        Vector2d startPoseVector = new Vector2d(-33.93, -63.09);
+        Vector2d startPoseVector = new Vector2d(13.85, -62.77);
 
         drive.setPoseEstimate(startPose);
 
-        Trajectory leftPos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-47.38, -30.86), Math.toRadians(111.27))
+        TrajectorySequence leftPos = drive.trajectorySequenceBuilder(startPose)
+                .forward(23,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(55))
+                .forward(10)
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-36.20, -27.00), Math.toRadians(88.68))
+                .forward(34,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory rightPos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-34.58, -47.54), Math.toRadians(70.24))
-                .splineTo(new Vector2d(-24.38, -30.37), Math.toRadians(90.00))
+        TrajectorySequence rightPos = drive.trajectorySequenceBuilder(startPose)
+                .forward(23,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(-55))
+                .forward(6,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory returnMiddle = drive.trajectoryBuilder(middlePos.end(), true)
-                .splineTo(startPoseVector, Math.toRadians(90))
+        Trajectory returnMiddle = drive.trajectoryBuilder(middlePos.end())
+                .back(31,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory returnLeft = drive.trajectoryBuilder(leftPos.end(), true)
-                .splineTo(startPoseVector, Math.toRadians(90))
+        TrajectorySequence returnLeft = drive.trajectorySequenceBuilder(leftPos.end())
+                .back(10,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(-55))
+                .back(23,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory returnRight = drive.trajectoryBuilder(rightPos.end(), true)
-                .splineTo(startPoseVector, Math.toRadians(90))
+        TrajectorySequence returnRight = drive.trajectorySequenceBuilder(rightPos.end())
+                .back(9,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(55))
+                .back(23,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory park = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-54.02, -48.84), Math.toRadians(146.50))
-                .splineTo(new Vector2d(-61.47, -29.24), Math.toRadians(114.36))
-                .splineTo(new Vector2d(-15.79, -8.50), Math.toRadians(0.00))
-                .splineTo(new Vector2d(9.31, -10.77), Math.toRadians(-12.24))
-                .splineTo(new Vector2d(61.80, -14.17), Math.toRadians(-28.30))
+        Trajectory park = drive.trajectoryBuilder(returnMiddle.end())
+                .strafeRight(100,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
+
+        TrajectorySequence backOut = drive.trajectorySequenceBuilder(leftPos.end())
+                .back(2)
+                .turn(Math.toRadians(-55))
+                .build();
+
 
         while(opModeIsActive()) {
             if (!rateLimit.hasExpired()) {
@@ -105,6 +133,7 @@ public class RedLeft extends LinearOpMode {
                 telemetry.addData("Block", block.toString());
                 int thisColorID = block.id;                      // save the current recognition's Color ID
                 telemetry.addData("This Color ID", thisColorID);     // display that Color ID
+                telemetry.update();
             }
             if (blocks.length >= 1) {
                 for (HuskyLens.Block block : blocks) {
@@ -112,37 +141,38 @@ public class RedLeft extends LinearOpMode {
                         //When middle position is detected, place the pixel and then return
 
                         telemetry.addLine("Middle Position");
+                        telemetry.update();
                         drive.followTrajectory(middlePos);
                         sleep(100);
                         drive.followTrajectory(returnMiddle);
-                        pixelPlaced = true;
+                        sleep(100);
+                        drive.followTrajectory(park);
+                        requestOpModeStop();
 
                     } else if (blocks[0].x < 150) {
                         //When left position is detected, place the pixel and then return
 
                         telemetry.addLine("Left Position");
-                        drive.followTrajectory(leftPos);
+                        telemetry.update();
+                        drive.followTrajectorySequence(leftPos);
                         sleep(100);
-                        drive.followTrajectory(returnLeft);
-                        pixelPlaced = true;
-
+                        drive.followTrajectorySequence(returnLeft);
+                        sleep(100);
+                        drive.followTrajectory(park);
+                        requestOpModeStop();
                     }
                 }
             } else {
                 //When right position is detected, place the pixel and then return
 
                 telemetry.addLine("Right Position");
-                /*drive.followTrajectory(rightPos);
+                telemetry.update();
+                drive.followTrajectorySequence(rightPos);
                 sleep(100);
-                drive.followTrajectory(returnRight);
-                pixelPlaced = true;*/
-
-            }
-
-            if (pixelPlaced) {
-                //place parking trajectory here
+                drive.followTrajectorySequence(returnRight);
+                sleep(100);
+                drive.followTrajectory(park);
                 requestOpModeStop();
-
             }
             telemetry.update();
 

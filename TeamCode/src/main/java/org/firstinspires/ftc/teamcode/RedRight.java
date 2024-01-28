@@ -46,52 +46,58 @@ public class RedRight extends LinearOpMode {
 
         Pose2d startPose = new Pose2d(13.85, -62.77, Math.toRadians(90.00));
 
-        Vector2d startPoseVector = new Vector2d(13.85, -62.77);
-
         drive.setPoseEstimate(startPose);
 
-        Trajectory leftPos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-47.38, -30.86), Math.toRadians(111.27),
+        TrajectorySequence leftPos = drive.trajectorySequenceBuilder(startPose)
+                .forward(22,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(55))
+                .forward(8.5)
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(12.88, -27), Math.toRadians(98.32),
+                .forward(34,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory rightPos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(23.57, -37.82), Math.toRadians(98.32),
+        TrajectorySequence rightPos = drive.trajectorySequenceBuilder(startPose)
+                .forward(23,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(-55))
+                .forward(7,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+        Trajectory returnMiddle = drive.trajectoryBuilder(middlePos.end())
+                .back(34,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory returnMiddle = drive.trajectoryBuilder(middlePos.end(), true)
-                .splineTo(startPoseVector, Math.toRadians(90),
+        TrajectorySequence returnRight = drive.trajectorySequenceBuilder(rightPos.end())
+                .back(23,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
-        Trajectory returnLeft = drive.trajectoryBuilder(leftPos.end(), true)
-                .splineTo(startPoseVector, Math.toRadians(90),
-                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
-        Trajectory returnRight = drive.trajectoryBuilder(rightPos.end(), true)
-                .splineTo(startPoseVector, Math.toRadians(90),
+                .turn(Math.toRadians(55))
+                .back(9,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory park = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(58.88, -59.04), Math.toRadians(-6.34),
+                .strafeRight(40,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
+        Trajectory backOut = drive.trajectoryBuilder(leftPos.end())
+                .back(4,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
 
         while(opModeIsActive()) {
             if (!rateLimit.hasExpired()) {
@@ -135,9 +141,9 @@ public class RedRight extends LinearOpMode {
 
                         telemetry.addLine("Left Position");
                         telemetry.update();
-                        drive.followTrajectory(leftPos);
+                        drive.followTrajectorySequence(leftPos);
                         sleep(100);
-                        drive.followTrajectory(returnLeft);
+                        drive.followTrajectory(backOut);
                         sleep(100);
                         drive.followTrajectory(park);
                         requestOpModeStop();
@@ -148,12 +154,12 @@ public class RedRight extends LinearOpMode {
 
                 telemetry.addLine("Right Position");
                 telemetry.update();
-                /*drive.followTrajectory(rightPos);
+                drive.followTrajectorySequence(rightPos);
                 sleep(100);
-                drive.followTrajectory(returnRight);
+                drive.followTrajectorySequence(returnRight);
                 sleep(100);
                 drive.followTrajectory(park);
-                requestOpModeStop();*/
+                requestOpModeStop();
             }
             telemetry.update();
 

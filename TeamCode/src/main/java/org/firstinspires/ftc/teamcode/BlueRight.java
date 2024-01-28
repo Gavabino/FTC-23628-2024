@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -43,25 +44,68 @@ public class BlueRight extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        Pose2d startPose = new Pose2d(-36.04, -62.93, Math.toRadians(90.00));
+        Pose2d startPose = new Pose2d(13.85, -62.77, Math.toRadians(90.00));
+
+        Vector2d startPoseVector = new Vector2d(13.85, -62.77);
 
         drive.setPoseEstimate(startPose);
 
-        Trajectory leftPos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-47.38, -30.86), Math.toRadians(111.27))
+        TrajectorySequence leftPos = drive.trajectorySequenceBuilder(startPose)
+                .forward(23,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(55))
+                .forward(6.5,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-36.20, -27.00), Math.toRadians(88.68))
+                .forward(34,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory reverseMiddle = drive.trajectoryBuilder(middlePos.end())
-                .back(24)
+        TrajectorySequence rightPos = drive.trajectorySequenceBuilder(startPose)
+                .forward(23,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(-55))
+                .forward(7,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory reverseLeft = drive.trajectoryBuilder(leftPos.end())
-                .back(24)
+        Trajectory returnMiddle = drive.trajectoryBuilder(middlePos.end())
+                .back(30,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
+
+        TrajectorySequence returnRight = drive.trajectorySequenceBuilder(rightPos.end())
+                .back(23,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(55))
+                .back(7,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+
+        Trajectory backOut = drive.trajectoryBuilder(leftPos.end())
+                .back(4,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+
+        Trajectory park = drive.trajectoryBuilder(startPose)
+                .strafeLeft(100,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+
+
+
 
         while(opModeIsActive()) {
             if (!rateLimit.hasExpired()) {
@@ -84,6 +128,7 @@ public class BlueRight extends LinearOpMode {
                 telemetry.addData("Block", block.toString());
                 int thisColorID = block.id;                      // save the current recognition's Color ID
                 telemetry.addData("This Color ID", thisColorID);     // display that Color ID
+                telemetry.update();
             }
             if (blocks.length >= 1) {
                 for (HuskyLens.Block block : blocks) {
@@ -91,17 +136,24 @@ public class BlueRight extends LinearOpMode {
                         //When middle position is detected, place the pixel and then return
 
                         telemetry.addLine("Middle Position");
+                        telemetry.update();
                         drive.followTrajectory(middlePos);
                         sleep(100);
-                        drive.followTrajectory(reverseMiddle);
+                        drive.followTrajectory(returnMiddle);
+                        sleep(100);
+                        drive.followTrajectory(park);
                         requestOpModeStop();
+
                     } else if (blocks[0].x < 150) {
                         //When left position is detected, place the pixel and then return
 
                         telemetry.addLine("Left Position");
-                        drive.followTrajectory(leftPos);
+                        telemetry.update();
+                        drive.followTrajectorySequence(leftPos);
                         sleep(100);
-                        drive.followTrajectory(reverseLeft);
+                        drive.followTrajectory(backOut);
+                        sleep(100);
+                        drive.followTrajectory(park);
                         requestOpModeStop();
                     }
                 }
@@ -109,6 +161,13 @@ public class BlueRight extends LinearOpMode {
                 //When right position is detected, place the pixel and then return
 
                 telemetry.addLine("Right Position");
+                telemetry.update();
+                drive.followTrajectorySequence(rightPos);
+                sleep(100);
+                drive.followTrajectorySequence(returnRight);
+                sleep(100);
+                drive.followTrajectory(park);
+                requestOpModeStop();
             }
             telemetry.update();
 
