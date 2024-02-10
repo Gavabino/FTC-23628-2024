@@ -51,7 +51,7 @@ public class BlueLeft extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence leftPos = drive.trajectorySequenceBuilder(startPose)
-                .forward(23,
+                .forward(24,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(55))
@@ -59,13 +59,13 @@ public class BlueLeft extends LinearOpMode {
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
-                .forward(34,
+                .forward(35,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence rightPos = drive.trajectorySequenceBuilder(startPose)
-                .forward(23,
+                .forward(24,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(-55))
@@ -75,7 +75,7 @@ public class BlueLeft extends LinearOpMode {
                 .build();
 
         Trajectory returnMiddle = drive.trajectoryBuilder(middlePos.end())
-                .back(31,
+                .back(32,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -85,7 +85,7 @@ public class BlueLeft extends LinearOpMode {
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(-55))
-                .back(23,
+                .back(24,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -95,20 +95,15 @@ public class BlueLeft extends LinearOpMode {
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(55))
-                .back(23,
+                .back(24,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory park = drive.trajectoryBuilder(returnMiddle.end())
-                .strafeRight(100,
+                .strafeLeft(100,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
-        TrajectorySequence backOut = drive.trajectorySequenceBuilder(leftPos.end())
-                .back(2)
-                .turn(Math.toRadians(-55))
                 .build();
 
 
@@ -157,7 +152,7 @@ public class BlueLeft extends LinearOpMode {
                         telemetry.update();
                         drive.followTrajectorySequence(leftPos);
                         sleep(100);
-                        drive.followTrajectorySequence(returnLeft1);
+                        drive.followTrajectorySequence(returnLeft);
                         sleep(100);
                         drive.followTrajectory(park);
                         requestOpModeStop();
@@ -168,12 +163,12 @@ public class BlueLeft extends LinearOpMode {
 
                 telemetry.addLine("Right Position");
                 telemetry.update();
-                /*drive.followTrajectory(rightPos);
+                drive.followTrajectorySequence(rightPos);
                 sleep(100);
-                drive.followTrajectory(returnRight);
+                drive.followTrajectorySequence(returnRight);
                 sleep(100);
                 drive.followTrajectory(park);
-                requestOpModeStop();*/
+                requestOpModeStop();
             }
             telemetry.update();
 

@@ -49,7 +49,7 @@ public class RedRight extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence leftPos = drive.trajectorySequenceBuilder(startPose)
-                .forward(22,
+                .forward(23,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(55))
@@ -57,13 +57,13 @@ public class RedRight extends LinearOpMode {
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
-                .forward(34,
+                .forward(35,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence rightPos = drive.trajectorySequenceBuilder(startPose)
-                .forward(23,
+                .forward(24,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(-55))

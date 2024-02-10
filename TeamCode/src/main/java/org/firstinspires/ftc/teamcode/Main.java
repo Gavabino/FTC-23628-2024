@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,6 +14,7 @@ public class Main extends LinearOpMode {
     /**
      * This function is executed when this Op Mode is selected from the Driver Station.
      */
+
     @Override
     public void runOpMode() {
         DcMotor rightFront = hardwareMap.get(DcMotor.class, "rightFront");
@@ -21,10 +23,9 @@ public class Main extends LinearOpMode {
         DcMotor leftRear = hardwareMap.get(DcMotor.class, "leftRear");
         DcMotor slide1 = hardwareMap.get(DcMotor.class, "slide1");
         DcMotor slide2 = hardwareMap.get(DcMotor.class, "slide2");
-        //DcMotor ArmMotor = hardwareMap.get(DcMotor.class, "ArmMotor");
-        //DcMotor SlideMotor = hardwareMap.get(DcMotor.class, "SlideMotor");
-        Servo launcher = hardwareMap.get(Servo.class, "launcher");
-        //Servo claw = hardwareMap.get(Servo.class, "claw");
+        DcMotor arm = hardwareMap.get(DcMotor.class, "arm");
+        CRServo launcher = hardwareMap.get(CRServo.class, "launcher");
+        Servo claw = hardwareMap.get(Servo.class, "claw");
 
         // Reverse the right side.
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -39,15 +40,13 @@ public class Main extends LinearOpMode {
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        /*ArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        SlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        /*ArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        SlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);*/
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -56,8 +55,11 @@ public class Main extends LinearOpMode {
         leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        int slideTargetPos = 0;
         int armTargetPos = 0;
+        double ServoPosition;
+
+        // Set servo to mid position
+        ServoPosition = 0;
 
         waitForStart();
         if (opModeIsActive()) {
@@ -65,18 +67,9 @@ public class Main extends LinearOpMode {
             while (opModeIsActive()) {
                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
                 telemetry.addData("Slide2 Position", slide2.getCurrentPosition());
-                /*telemetry.addData("Arm Motor Position", ArmMotor.getCurrentPosition());
-                telemetry.addData("Slide Motor Position", SlideMotor.getCurrentPosition());
-                telemetry.addData("Claw Position", claw.getPosition());*/
+                telemetry.addData("Arm Motor Position", arm.getCurrentPosition());
+                telemetry.addData("Claw Position", claw.getPosition());
                 telemetry.update();
-
-                /*ArmMotor.setTargetPosition(armTargetPos);
-                SlideMotor.setTargetPosition(slideTargetPos);
-                SlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                ArmMotor.setPower(0.25);
-                SlideMotor.setPower(0.25); */
 
                 if (gamepad1.left_stick_y > 0.5 && gamepad1.left_stick_x > 0.5) {
                     rightFront.setPower(-0.75);
@@ -145,10 +138,10 @@ public class Main extends LinearOpMode {
                     rightRear.setPower(1);
                     leftRear.setPower(-1);
                 }
-                if (gamepad2.x) {
+                if (gamepad2.y) {
                     slide1.setPower(0.48625);
                     slide2.setPower(0.5);
-                } else if (gamepad2.y) {
+                } else if (gamepad2.a) {
                     slide1.setPower(-0.48625);
                     slide2.setPower(-0.5);
                 } else {
@@ -156,38 +149,39 @@ public class Main extends LinearOpMode {
                     slide2.setPower(0);
                 }
 
-                /* nif (gamepad2.left_bumper) {
-                    armTargetPos += 1.2;
-                }
                 if (gamepad2.right_bumper) {
-                    armTargetPos += -1.2;
+                    armTargetPos += 1;
+                } else if (gamepad2.left_bumper) {
+                    armTargetPos -= 1;
                 }
-                if (gamepad2.a) {
-                    slideTargetPos += 1.2;
-                } else if (gamepad2.b) {
-                    slideTargetPos += -1.2;
+
+                if (gamepad1.a) {
+                    launcher.setPower(-1);
+                } else {
+                    launcher.setPower(0);
                 }
-                if (gamepad2.dpad_right) {
-                    slideTargetPos = -105;
-                    armTargetPos = 385;
+
+                // Use gamepad X and B to open close servo
+                if (gamepad2.x) {
+                    ServoPosition = 0.62;
+                }
+                if (gamepad2.b) {
+                    ServoPosition = 1;
                 }
                 if (gamepad2.dpad_up) {
-                    slideTargetPos = 0;
-                    armTargetPos = 0;
+                    ServoPosition = 0;
                 }
                 if (gamepad2.dpad_left) {
-                    slideTargetPos = 40;
-                    armTargetPos = 385;
+                    ServoPosition = ServoPosition - 0.01;
                 }
-                /*if (gamepad1.a) {
-                    claw.setPosition(0);
-                } else {
-                    claw.setPosition(10);
-                }*/
-
-                if (gamepad1.b) {
-                    launcher.setPosition(4);
+                if (gamepad2.dpad_right) {
+                    ServoPosition = ServoPosition + 0.01;
                 }
+                claw.setPosition(ServoPosition);
+                arm.setTargetPosition(armTargetPos);
+                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                arm.setPower(1);
+                telemetry.update();
             }
         }
     }
