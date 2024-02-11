@@ -28,7 +28,7 @@ public class Main extends LinearOpMode {
         Servo claw = hardwareMap.get(Servo.class, "claw");
 
         // Reverse the right side.
-        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -156,7 +156,7 @@ public class Main extends LinearOpMode {
                 }
 
                 if (gamepad1.a) {
-                    launcher.setPower(-1);
+                    launcher.setPower(1);
                 } else {
                     launcher.setPower(0);
                 }
