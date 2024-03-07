@@ -16,8 +16,8 @@ import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(preselectTeleOp = "Main")
-public class BlueLeft extends LinearOpMode {
+@Autonomous(preselectTeleOp = "Main", group = "Wall Side")
+public class BlueLeftWallSide extends LinearOpMode {
     private final int READ_PERIOD = 1;
 
     private HuskyLens huskyLens;

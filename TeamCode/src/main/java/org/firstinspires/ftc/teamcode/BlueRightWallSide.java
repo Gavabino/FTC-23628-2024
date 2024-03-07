@@ -16,8 +16,8 @@ import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(preselectTeleOp = "Main")
-public class RedLeft extends LinearOpMode {
+@Autonomous(preselectTeleOp = "Main", group = "Wall Side")
+public class BlueRightWallSide extends LinearOpMode {
     private final int READ_PERIOD = 1;
 
     private HuskyLens huskyLens;
@@ -55,7 +55,9 @@ public class RedLeft extends LinearOpMode {
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(55))
-                .forward(10)
+                .forward(6.5,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
@@ -69,7 +71,7 @@ public class RedLeft extends LinearOpMode {
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(-55))
-                .forward(6,
+                .forward(7,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -80,36 +82,29 @@ public class RedLeft extends LinearOpMode {
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        TrajectorySequence returnLeft = drive.trajectorySequenceBuilder(leftPos.end())
-                .back(10,
-                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .turn(Math.toRadians(-55))
-                .back(23,
-                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
         TrajectorySequence returnRight = drive.trajectorySequenceBuilder(rightPos.end())
-                .back(9,
+                .back(23,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(55))
-                .back(23,
+                .back(8,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory park = drive.trajectoryBuilder(returnMiddle.end())
-                .strafeRight(100,
+        Trajectory backOut = drive.trajectoryBuilder(leftPos.end())
+                .back(5,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        TrajectorySequence backOut = drive.trajectorySequenceBuilder(leftPos.end())
-                .back(2)
-                .turn(Math.toRadians(-55))
+        Trajectory park = drive.trajectoryBuilder(startPose)
+                .strafeLeft(100,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
+
+
 
 
         while(opModeIsActive()) {
@@ -137,7 +132,7 @@ public class RedLeft extends LinearOpMode {
             }
             if (blocks.length >= 1) {
                 for (HuskyLens.Block block : blocks) {
-                    if ((block.id == 2) && (block.x > 150)) {
+                    if ((block.id == 1) && (block.x > 150)) {
                         //When middle position is detected, place the pixel and then return
 
                         telemetry.addLine("Middle Position");
@@ -156,7 +151,7 @@ public class RedLeft extends LinearOpMode {
                         telemetry.update();
                         drive.followTrajectorySequence(leftPos);
                         sleep(100);
-                        drive.followTrajectorySequence(returnLeft);
+                        drive.followTrajectory(backOut);
                         sleep(100);
                         drive.followTrajectory(park);
                         requestOpModeStop();

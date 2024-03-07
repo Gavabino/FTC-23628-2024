@@ -25,13 +25,14 @@ public class Main extends LinearOpMode {
         DcMotor slide2 = hardwareMap.get(DcMotor.class, "slide2");
         DcMotor arm = hardwareMap.get(DcMotor.class, "arm");
         CRServo launcher = hardwareMap.get(CRServo.class, "launcher");
+        CRServo hand = hardwareMap.get(CRServo.class, "hand");
         Servo claw = hardwareMap.get(Servo.class, "claw");
 
         // Reverse the right side.
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         // This makes the robot BRAKE when power becomes zero. The other
         // mode, FLOAT, makes the robot go in neutral and will drift.
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -64,6 +65,8 @@ public class Main extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
             // Put run blocks here.
+            claw.setPosition(0);
+
             while (opModeIsActive()) {
                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
                 telemetry.addData("Slide2 Position", slide2.getCurrentPosition());
@@ -156,9 +159,15 @@ public class Main extends LinearOpMode {
                 }
 
                 if (gamepad1.a) {
-                    launcher.setPower(1);
+                    launcher.setPower(-1);
                 } else {
                     launcher.setPower(0);
+                }
+
+                if (gamepad1.b) {
+                    hand.setPower(-1);
+                } else {
+                    hand.setPower(0);
                 }
 
                 // Use gamepad X and B to open close servo
