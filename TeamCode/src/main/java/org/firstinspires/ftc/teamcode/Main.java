@@ -30,7 +30,7 @@ public class Main extends LinearOpMode {
 
         // Reverse the right side.
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         // This makes the robot BRAKE when power becomes zero. The other
@@ -159,7 +159,7 @@ public class Main extends LinearOpMode {
                 }
 
                 if (gamepad1.a) {
-                    launcher.setPower(-1);
+                    launcher.setPower(1);
                 } else {
                     launcher.setPower(0);
                 }
@@ -172,7 +172,13 @@ public class Main extends LinearOpMode {
 
                 // Use gamepad X and B to open close servo
                 if (gamepad2.x) {
-                    ServoPosition = 0.62;
+                    ServoPosition = 0.54;
+
+
+
+
+
+
                 }
                 if (gamepad2.b) {
                     ServoPosition = 1;

@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -16,8 +17,8 @@ import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(preselectTeleOp = "Main", group = "Wall Side")
-public class BlueLeftWallSide extends LinearOpMode {
+@Autonomous(preselectTeleOp = "Main")
+public class BlueLeft extends LinearOpMode {
     private final int READ_PERIOD = 1;
 
     private HuskyLens huskyLens;
@@ -40,6 +41,8 @@ public class BlueLeftWallSide extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
+        CRServo hand = hardwareMap.get(CRServo.class, "hand");
+
         waitForStart();
 
         if (isStopRequested()) return;
@@ -55,7 +58,9 @@ public class BlueLeftWallSide extends LinearOpMode {
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(55))
-                .forward(10)
+                .forward(7,
+                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
@@ -69,41 +74,64 @@ public class BlueLeftWallSide extends LinearOpMode {
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .turn(Math.toRadians(-55))
-                .forward(6,
-                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .forward(8.5)
                 .build();
-
         Trajectory returnMiddle = drive.trajectoryBuilder(middlePos.end())
-                .back(32,
-                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
-        TrajectorySequence returnLeft = drive.trajectorySequenceBuilder(leftPos.end())
-                .back(10,
-                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .turn(Math.toRadians(-55))
-                .back(24,
+                .back(8,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence returnRight = drive.trajectorySequenceBuilder(rightPos.end())
-                .back(9,
+                .back(8,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .turn(Math.toRadians(55))
-                .back(24,
-                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(-35))
                 .build();
 
-        Trajectory park = drive.trajectoryBuilder(returnMiddle.end())
-                .strafeLeft(100,
-                        SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+        TrajectorySequence returnLeft = drive.trajectorySequenceBuilder(leftPos.end())
+                .back(10,
+                    SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .turn(Math.toRadians(-55))
+                .build();
+        TrajectorySequence middlePixel = drive.trajectorySequenceBuilder(returnMiddle.end())
+                .turn(Math.toRadians(-90))
+                .back(40)
+                .strafeLeft(4)
+                .back(10)
+                .build();
+
+        TrajectorySequence rightPixel = drive.trajectorySequenceBuilder(returnRight.end())
+                .back(45)
+                .strafeLeft(15)
+                .back(5.5)
+                .build();
+
+        TrajectorySequence leftPixel = drive.trajectorySequenceBuilder(returnLeft.end())
+                .turn(Math.toRadians(-90))
+                .strafeRight(4)
+                .back(50)
+                .strafeLeft(6)
+                .back(3)
+                .build();
+
+        TrajectorySequence leftPark = drive.trajectorySequenceBuilder(leftPixel.end())
+                .forward(10)
+                .strafeLeft(20)
+                .back(5)
+                .build();
+
+        TrajectorySequence middlePark = drive.trajectorySequenceBuilder(middlePixel.end())
+                .forward(10)
+                .strafeLeft(15)
+                .back(5)
+                .build();
+
+        TrajectorySequence rightPark = drive.trajectorySequenceBuilder(rightPixel.end())
+                .forward(10)
+                .strafeLeft(15)
+                .back(5)
                 .build();
 
 
@@ -133,7 +161,7 @@ public class BlueLeftWallSide extends LinearOpMode {
             }
             if (blocks.length >= 1) {
                 for (HuskyLens.Block block : blocks) {
-                    if ((block.id == 1) && (block.x > 150)) {
+                    if ((block.id == 1 || block.id == 2) && (block.x > 150)) {
                         //When middle position is detected, place the pixel and then return
 
                         telemetry.addLine("Middle Position");
@@ -142,7 +170,13 @@ public class BlueLeftWallSide extends LinearOpMode {
                         sleep(100);
                         drive.followTrajectory(returnMiddle);
                         sleep(100);
-                        drive.followTrajectory(park);
+                        drive.followTrajectorySequence(middlePixel);
+                        sleep(100);
+                        hand.setPower(-1);
+                        sleep(1300);
+                        hand.setPower(1);
+                        sleep(1000);
+                        drive.followTrajectorySequence(middlePark);
                         requestOpModeStop();
 
                     } else if (blocks[0].x < 150) {
@@ -154,7 +188,13 @@ public class BlueLeftWallSide extends LinearOpMode {
                         sleep(100);
                         drive.followTrajectorySequence(returnLeft);
                         sleep(100);
-                        drive.followTrajectory(park);
+                        drive.followTrajectorySequence(leftPixel);
+                        sleep(100);
+                        hand.setPower(-1);
+                        sleep(1300);
+                        hand.setPower(1);
+                        sleep(1000);
+                        drive.followTrajectorySequence(leftPark);
                         requestOpModeStop();
                     }
                 }
@@ -167,7 +207,12 @@ public class BlueLeftWallSide extends LinearOpMode {
                 sleep(100);
                 drive.followTrajectorySequence(returnRight);
                 sleep(100);
-                drive.followTrajectory(park);
+                drive.followTrajectorySequence(rightPixel);
+                hand.setPower(-1);
+                sleep(1300);
+                hand.setPower(1);
+                sleep(1000);
+                drive.followTrajectorySequence(rightPark);
                 requestOpModeStop();
             }
             telemetry.update();

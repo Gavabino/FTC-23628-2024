@@ -59,7 +59,7 @@ public class RedRight extends LinearOpMode {
                 .build();
 
         Trajectory middlePos = drive.trajectoryBuilder(startPose)
-                .forward(37,
+                .forward(36,
                         SampleMecanumDrive.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -101,14 +101,16 @@ public class RedRight extends LinearOpMode {
 
         TrajectorySequence middlePixel = drive.trajectorySequenceBuilder(returnMiddle.end())
                 .turn(Math.toRadians(90))
-                .back(51)
-                .strafeRight(10)
-                .back(1)
+                .back(40)
+                .strafeRight(5)
+                .back(10)
                 .build();
 
         TrajectorySequence rightPixel = drive.trajectorySequenceBuilder(returnRight.end())
                 .turn(Math.toRadians(90))
-                .back(55)
+                .back(50)
+                .strafeRight(5)
+                .back(3)
                 .build();
 
         TrajectorySequence leftPixel = drive.trajectorySequenceBuilder(returnLeft.end())
@@ -123,11 +125,17 @@ public class RedRight extends LinearOpMode {
                 .back(5)
                 .build();
 
-        //TrajectorySequence middlePark = drive.trajectorySequenceBuilder(middlePixel.end())
-           //     .build();
+        TrajectorySequence middlePark = drive.trajectorySequenceBuilder(middlePixel.end())
+                .forward(10)
+                .strafeRight(15)
+                .back(5)
+                .build();
 
-        //TrajectorySequence rightPark = drive.trajectorySequenceBuilder(rightPixel.end())
-        //        .build();
+        TrajectorySequence rightPark = drive.trajectorySequenceBuilder(rightPixel.end())
+                .forward(10)
+                .strafeRight(20)
+                .back(5)
+                .build();
 
         while(opModeIsActive()) {
             if (!rateLimit.hasExpired()) {
@@ -154,7 +162,7 @@ public class RedRight extends LinearOpMode {
             }
             if (blocks.length >= 1) {
                 for (HuskyLens.Block block : blocks) {
-                    if ((block.id == 1) && (block.x > 150)) {
+                    if ((block.id == 1 || block.id == 2) && (block.x > 150)) {
                         //When middle position is detected, place the pixel and then return
 
                         telemetry.addLine("Middle Position");
@@ -166,9 +174,10 @@ public class RedRight extends LinearOpMode {
                         drive.followTrajectorySequence(middlePixel);
                         sleep(100);
                         hand.setPower(-1);
-                        sleep(1450);
+                        sleep(1300);
                         hand.setPower(1);
                         sleep(1000);
+                        drive.followTrajectorySequence(middlePark);
                         requestOpModeStop();
 
                     } else if (blocks[0].x < 150) {
@@ -201,9 +210,10 @@ public class RedRight extends LinearOpMode {
                 sleep(100);
                 drive.followTrajectorySequence(rightPixel);
                 hand.setPower(-1);
-                sleep(1450);
+                sleep(1300);
                 hand.setPower(1);
                 sleep(1000);
+                drive.followTrajectorySequence(rightPark);
                 requestOpModeStop();
             }
             telemetry.update();
